@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Example of the Implicit Grant flow with Spotify</title>
+  </head>
+
+  <body>
+    <p>Redirecting back to homepage...</p>
+    <script>
+      (function() {
+        // redirect back to homepage
+        var query = window.location.hash.substring(1);
+        window.location = 'http://localhost:8888/#' + query;
+      })();
+    </script>
+  </body>
+</html>

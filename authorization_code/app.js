@@ -15,32 +15,24 @@ var cookieParser = require('cookie-parser');
 
 var client_id = 'CLIENT_ID'; // Your client id
 var client_secret = 'CLIENT_SECRET'; // Your secret
-var redirect_uri = 'REDIRECT_URI'; // Your redirect uri
-
-/**
- * Generates a random string containing numbers and letters
- * @param  {number} length The length of the string
- * @return {string} The generated string
- */
-var generateRandomString = function(length) {
-  var text = '';
-  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for (var i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
-};
-
+var redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
 var stateKey = 'spotify_auth_state';
 
-var app = express();
+function login(req, res) {
+  /**
+   * Generates a random string containing numbers and letters
+   * @param  {number} length The length of the string
+   * @return {string} The generated string
+   */
+  var generateRandomString = function(length) {
+    var text = '';
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-app.use(express.static(__dirname + '/public'))
-   .use(cors())
-   .use(cookieParser());
-
-app.get('/login', function(req, res) {
+    for (var i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  };
 
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
@@ -55,10 +47,8 @@ app.get('/login', function(req, res) {
       redirect_uri: redirect_uri,
       state: state
     }));
-});
-
-app.get('/callback', function(req, res) {
-
+}
+function callback(req, res) {
   // your application requests refresh and access tokens
   // after checking the state parameter
 
@@ -117,10 +107,8 @@ app.get('/callback', function(req, res) {
       }
     });
   }
-});
-
-app.get('/refresh_token', function(req, res) {
-
+}
+function refreshToken(req, res) {
   // requesting access token from refresh token
   var refresh_token = req.query.refresh_token;
   var authOptions = {
@@ -141,7 +129,15 @@ app.get('/refresh_token', function(req, res) {
       });
     }
   });
-});
+}
+
+var app = express();
+app.use(express.static(__dirname + '/public'))
+   .use(cors())
+   .use(cookieParser());
+app.get('/login', login);
+app.get('/callback', callback);
+app.get('/refresh_token', refreshToken);
 
 console.log('Listening on 8888');
 app.listen(8888);
